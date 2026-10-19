@@ -9,6 +9,8 @@ __pycache__/
 .env.*
 !.env.example
 profiles.yml
+# Allow the safe CI profile with dummy credentials
+!.github/ci/profiles.yml
 *.pem
 *.key
 
@@ -26,3 +28,5 @@ profiles.yml
 .idea/
 .DS_Store
 Thumbs.db
+
+.user.yml

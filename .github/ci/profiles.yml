@@ -1,0 +1,13 @@
+
+marketing_dbt:
+  target: ci
+  outputs:
+    ci:
+      type: databricks
+      host: example.cloud.databricks.com
+      http_path: /sql/1.0/warehouses/example
+      catalog: marketing_ci
+      schema: ci
+      auth_type: pat
+      token: placeholder-not-a-real-token
+      threads: 4

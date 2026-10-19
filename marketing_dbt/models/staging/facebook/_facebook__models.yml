@@ -101,9 +101,11 @@ models:
       - name: clicks
         description: "Number of recorded advertisement clicks."
 
+        
     data_tests:
       - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - ad_id
-            - account_id
-            - ad_date
+          arguments:
+            combination_of_columns:
+              - ad_id
+              - account_id
+              - ad_date

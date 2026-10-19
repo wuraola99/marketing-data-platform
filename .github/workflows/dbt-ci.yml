@@ -1,0 +1,33 @@
+
+name: dbt CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate-dbt:
+    name: Validate dbt Project
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Install Python dependencies
+        run: uv sync --frozen
+
+      - name: Install dbt packages
+        working-directory: marketing_dbt
+        run: uv run dbt deps
+
+      - name: Validate dbt project
+        working-directory: marketing_dbt
+        run: uv run dbt parse --profiles-dir ../.github/ci

@@ -94,7 +94,8 @@ models:
 
     data_tests:
       - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
+          arguments:
+            combination_of_columns:
             - ad_id
             - ad_date
             - country_code
