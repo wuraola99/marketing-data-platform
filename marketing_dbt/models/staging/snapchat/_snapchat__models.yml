@@ -1,0 +1,102 @@
+version: 2
+
+models:
+  - name: stg_snapchat__campaigns
+    description: "Cleaned Snapchat advertising campaign data."
+    columns:
+      - name: campaign_id
+        description: "Unique identifier for each Snapchat advertising campaign."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: account_id
+        description: "Identifier of the advertising account associated with the campaign."
+        data_tests:
+          - not_null
+
+      - name: campaign_name
+        description: "Name of the Snapchat advertising campaign."
+
+  - name: stg_snapchat__adgroups
+    description: "Snapchat advertising ad group records, including historical versions."
+    columns:
+      - name: ad_group_record_id
+        description: "Unique identifier for each source ad group record."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: ad_group_id
+        description: "Identifier of the Snapchat ad group. May appear multiple times due to historical versions."
+        data_tests:
+          - not_null
+
+      - name: campaign_id
+        description: "Identifier of the campaign associated with the ad group."
+
+      - name: ad_group_name
+        description: "Name of the Snapchat ad group."
+
+      - name: updated_at
+        description: "Timestamp when this ad group record was last updated."
+
+  - name: stg_snapchat__ads
+    description: "Cleaned Snapchat advertisement data, including ad group relationships."
+    columns:
+      - name: ad_id
+        description: "Unique identifier for each Snapchat advertisement."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: ad_group_id
+        description: "Identifier of the Snapchat ad group associated with the advertisement."
+        data_tests:
+          - not_null
+
+      - name: ad_name
+        description: "Name of the Snapchat advertisement."
+
+      - name: updated_at
+        description: "Timestamp when the advertisement was last updated."
+
+  - name: stg_snapchat__ads_stats
+    description: "Snapchat advertising performance data containing spend, impressions, clicks, currency, country, and reporting date."
+    columns:
+      - name: ad_id
+        description: "Advertisement identifier sourced from ad_detail_id."
+        data_tests:
+          - not_null
+
+      - name: ad_date
+        description: "Date of the advertising performance record."
+        data_tests:
+          - not_null
+
+      - name: currency_code
+        description: "Currency in which advertising spend is recorded."
+
+      - name: country_code
+        description: "Country associated with the performance record."
+
+      - name: spend
+        description: "Advertising expenditure in the recorded currency."
+
+      - name: impressions
+        description: "Number of advertisement impressions."
+
+      - name: clicks
+        description: "Number of advertisement clicks."
+
+      - name: data_source
+        description: "Source identifier supplied with the performance data."
+
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - ad_id
+            - ad_date
+            - country_code
+            - currency_code
+            - data_source

@@ -1,0 +1,118 @@
+version: 2
+
+models:
+  - name: int_snapchat__latest_adgroups
+    description: >
+      Latest available record for each Snapchat advertising
+      ad group, selected using the most recent update timestamp.
+      This model provides a current-state lookup and does not
+      represent historical point-in-time relationships.
+
+    columns:
+      - name: ad_group_id
+        description: "Unique identifier for each Snapchat ad group."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: campaign_id
+        description: "Campaign associated with the ad group."
+
+      - name: ad_group_name
+        description: "Name of the ad group."
+
+      - name: updated_at
+        description: "Timestamp of the latest available update."
+
+  - name: int_facebook__ad_performance
+    description: >
+      Facebook daily advertisement performance enriched with
+      advertisement, campaign, ad group, and account information.
+      Grain: one record per advertisement, account, and date.
+
+    columns:
+      - name: ad_id
+        description: "Unique Facebook advertisement identifier."
+        data_tests:
+          - not_null
+
+      - name: account_id
+        description: "Facebook advertising account identifier."
+        data_tests:
+          - not_null
+
+      - name: ad_date
+        description: "Date of the advertising performance record."
+        data_tests:
+          - not_null
+
+      - name: currency_code
+        description: "Currency associated with the Facebook advertising account."
+
+      - name: spend
+        description: "Daily advertising expenditure in the account currency."
+
+      - name: impressions
+        description: "Daily advertisement impressions."
+
+      - name: clicks
+        description: "Daily advertisement clicks."
+
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - ad_id
+              - account_id
+              - ad_date
+  - name: int_snapchat__ad_performance
+    description: >
+      Snapchat advertisement performance enriched with
+      advertisement, latest ad group, and campaign information.
+      Grain: one record per advertisement, date, country,
+      currency, and data source.
+
+    columns:
+      - name: ad_id
+        description: "Snapchat advertisement identifier."
+        data_tests:
+          - not_null
+
+      - name: ad_date
+        description: "Performance reporting date."
+        data_tests:
+          - not_null
+
+      - name: ad_group_id
+        description: "Ad group associated with the advertisement."
+
+      - name: campaign_id
+        description: "Campaign derived from the latest available ad group record."
+
+      - name: currency_code
+        description: "Currency of advertising spend."
+
+      - name: country_code
+        description: "Country associated with the performance record."
+
+      - name: data_source
+        description: "Original performance data source."
+
+      - name: spend
+        description: "Advertising spend in the recorded currency."
+
+      - name: impressions
+        description: "Advertisement impressions."
+
+      - name: clicks
+        description: "Advertisement clicks."
+
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - ad_id
+              - ad_date
+              - country_code
+              - currency_code
+              - data_source

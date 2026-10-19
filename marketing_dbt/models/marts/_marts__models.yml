@@ -1,0 +1,104 @@
+version: 2
+
+models:
+  - name: fct_ad_performance
+    description: >
+      Unified Facebook and Snapchat advertising performance.
+      Preserves the original reporting grain of each platform.
+      Advertising spend is recorded in its original currency.
+
+    columns:
+      - name: platform
+        description: "Advertising platform: Facebook or Snapchat."
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['facebook', 'snapchat']
+
+      - name: ad_id
+        description: "Advertisement identifier within its platform."
+        data_tests:
+          - not_null
+
+      - name: ad_date
+        description: "Date of advertising activity."
+        data_tests:
+          - not_null
+
+      - name: currency_code
+        description: "Original currency of advertising spend."
+        data_tests:
+          - not_null
+
+      - name: spend
+        description: "Advertising expenditure in the original currency."
+
+      - name: impressions
+        description: "Number of advertising impressions."
+
+      - name: clicks
+        description: "Number of advertising clicks."
+
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - platform
+              - ad_id
+              - account_id
+              - ad_date
+              - country_code
+              - currency_code
+              - data_source
+
+  - name: mart_daily_ad_performance
+    description: >
+      Daily marketing performance aggregated by advertising
+      platform, reporting date, and original currency.
+      Includes spend, impressions, clicks, CTR, CPC, and CPM.
+
+    columns:
+      - name: platform
+        description: "Advertising platform."
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['facebook', 'snapchat']
+
+      - name: ad_date
+        description: "Advertising performance reporting date."
+        data_tests:
+          - not_null
+
+      - name: currency_code
+        description: "Original currency of advertising spend."
+        data_tests:
+          - not_null
+
+      - name: total_spend
+        description: "Total daily advertising spend in the original currency."
+
+      - name: total_impressions
+        description: "Total daily advertising impressions."
+
+      - name: total_clicks
+        description: "Total daily advertising clicks."
+
+      - name: ctr_pct
+        description: "Click-through rate expressed as a percentage."
+
+      - name: cpc
+        description: "Average cost per click in the original currency."
+
+      - name: cpm
+        description: "Cost per 1,000 impressions in the original currency."
+
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - platform
+              - ad_date
+              - currency_code

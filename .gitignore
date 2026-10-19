@@ -1,0 +1,28 @@
+# Python virtual environments
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Environment variables and credentials
+.env
+.env.*
+!.env.example
+profiles.yml
+*.pem
+*.key
+
+# dbt generated files
+**/target/
+**/dbt_packages/
+**/logs/
+
+# Elementary generated reports
+**/edr_target/
+**/elementary_report.html
+
+# IDE and operating system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

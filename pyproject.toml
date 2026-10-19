@@ -1,0 +1,20 @@
+[project]
+name = "marketing-data-platform"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Adedoyin", email = "diwuraadelakun@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "dbt-databricks>=1.12.7",
+    "elementary-data>=0.26.1",
+]
+
+[project.scripts]
+marketing-data-platform = "marketing_data_platform:main"
+
+[build-system]
+requires = ["uv_build>=0.12.17,<0.13.0"]
+build-backend = "uv_build"

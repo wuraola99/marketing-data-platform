@@ -1,0 +1,109 @@
+version: 2
+
+models:
+  - name: stg_facebook__accounts
+    description: "Cleaned Facebook advertising account data."
+
+    columns:
+      - name: account_id
+        description: "Unique identifier for each Facebook advertising account."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: account_name
+        description: "Name of the Facebook advertising account."
+
+      - name: currency_code
+        description: "Currency used by the advertising account."
+
+  - name: stg_facebook__campaigns
+    description: "Cleaned Facebook advertising campaign data."
+    columns:
+      - name: campaign_id
+        description: "Unique identifier for each Facebook campaign."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: campaign_name
+        description: "Name of the Facebook advertising campaign."
+
+      - name: updated_at
+        description: "Timestamp when the campaign was last updated."
+
+  - name: stg_facebook__adgroups
+    description: "Cleaned Facebook advertising ad group data."
+    columns:
+      - name: ad_group_id
+        description: "Unique identifier for each Facebook ad group."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: ad_group_name
+        description: "Name of the Facebook ad group."
+
+      - name: updated_at
+        description: "Timestamp when the ad group was last updated."
+
+  - name: stg_facebook__ads
+    description: "Cleaned Facebook advertising data, including campaign, ad group, and account identifiers."
+    columns:
+      - name: ad_id
+        description: "Unique identifier for each Facebook advertisement."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: campaign_id
+        description: "Identifier of the campaign associated with the advertisement."
+
+      - name: ad_group_id
+        description: "Identifier of the ad group associated with the advertisement."
+
+      - name: account_id
+        description: "Identifier of the Facebook advertising account."
+
+      - name: ad_name
+        description: "Name of the advertisement."
+
+      - name: ad_status
+        description: "Current status of the advertisement."
+
+      - name: updated_at
+        description: "Timestamp when the advertisement was last updated."
+
+  - name: stg_facebook__ads_stats
+    description: "Daily Facebook advertisement performance, including spend, impressions, and clicks."
+    columns:
+      - name: ad_id
+        description: "Identifier of the Facebook advertisement."
+        data_tests:
+          - not_null
+
+      - name: account_id
+        description: "Identifier of the Facebook advertising account."
+        data_tests:
+          - not_null
+
+      - name: ad_date
+        description: "Date of the advertising performance record."
+        data_tests:
+          - not_null
+
+      - name: spend
+        description: "Advertising expenditure in the account's currency."
+
+      - name: impressions
+        description: "Number of times the advertisement was displayed."
+
+      - name: clicks
+        description: "Number of recorded advertisement clicks."
+
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - ad_id
+            - account_id
+            - ad_date

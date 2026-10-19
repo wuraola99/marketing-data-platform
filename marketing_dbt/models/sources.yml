@@ -1,0 +1,25 @@
+version: 2
+
+sources:
+  - name: facebook
+    description: Raw Facebook advertising data
+    database: marketing_dev
+    schema: bronze
+
+    tables:
+      - name: fb_accounts
+      - name: fb_adgroups
+      - name: fb_ads
+      - name: fb_ads_stats
+      - name: fb_campaigns
+
+  - name: snapchat
+    description: Raw Snapchat advertising data
+    database: marketing_dev
+    schema: bronze
+
+    tables:
+      - name: snapchat_adgroups
+      - name: snapchat_ads
+      - name: snapchat_ads_stats
+      - name: snapchat_campaigns
