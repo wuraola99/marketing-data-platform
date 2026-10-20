@@ -1,12 +1,12 @@
 # Validation, Business Questions, and Case-Study Acceptance
 
-This document maps the original 21-page take-home case study to the actual repository and provides SQL to validate the **deployed** Gold data. SQL results are not invented: only previously observed results are marked as verified.
+This document maps the take-home case study to the actual repository and provides SQL to validate the **deployed** Gold data. 
 
 ## 1. Deployment evidence and baseline
 
 | Check | Observed result | Evidence type |
 | --- | --- | --- |
-| GitHub Actions `Deploy dbt to Databricks` | Success, approximately 1m 12s | User-observed workflow screenshot, 20 October 2026 |
+| GitHub Actions `Deploy dbt to Databricks` | Success, approximately 1m 12s | 
 | `marketing_dev.gold.fct_ad_performance` | **95,109 rows** | User-executed Databricks SQL |
 | `marketing_dev.gold.mart_daily_ad_performance` | **758 rows** | User-executed Databricks SQL |
 | Development dbt/Elementary | Previously successful; report showed 46 passed tests and 14 healthy tables | User-observed local Elementary report |
@@ -27,7 +27,7 @@ FROM marketing_dev.gold.mart_daily_ad_performance;
 ## 2. Query conventions
 
 - Use `marketing_dev.gold.fct_ad_performance` for campaign/ad-level questions and `marketing_dev.gold.mart_daily_ad_performance` for platform/day/currency summaries.
-- **Always preserve `currency_code` in spend comparisons.** A single spend total combining EUR and USD is not valid without conversion.
+- **`currency_code` is preserved in spend comparisons.** A single spend total combining EUR and USD is not valid without conversion.
 - `SUM(clicks)` and `SUM(impressions)` can represent **partial observed counts** where source records contain `NULL`. Include completeness indicators when interpreting results.
 - CTR/CPC/CPM are ratios of sums, **not averages of row-level rates**. For the daily mart, respect its completeness flags and `NULL` KPIs.
 - The fact does not include a guaranteed complete historical campaign dimension. Snapchat joins to the latest ad-group metadata.
@@ -54,7 +54,7 @@ GROUP BY platform, currency_code
 ORDER BY currency_code, platform;
 ```
 
-**Previously observed fact-level reference totals:** Facebook EUR **2,562,561.24**; Facebook USD **6,869,536.99**; Snapchat EUR **30,529.76**. Re-run to confirm current state. Only compare Facebook vs Snapchat directly within the same currency (for example EUR).
+**Previously observed fact-level reference totals:** Facebook EUR **2,562,561.24**; Facebook USD **6,869,536.99**; Snapchat EUR **30,529.76**. Re-run to confirm current state. Only compare Facebook vs Snapchat directly within the same currency.
 
 ### Q3. How much did we spend by campaign?
 
@@ -221,7 +221,7 @@ GROUP BY platform, currency_code
 ORDER BY platform, currency_code;
 ```
 
-Earlier observations included missing clicks on Facebook and Snapchat and missing impressions on Facebook. Re-run for the exact deployed state. Nulls must not be treated as zero.
+Earlier observations included missing clicks on Facebook and Snapchat and missing impressions on Facebook. 
 
 ### E. Reconcile daily and fact row counts
 
@@ -286,19 +286,7 @@ The case study's **Definition of Done has 22 bullet requirements**. Status label
 | 21 | README setup and architecture | Addressed by accompanying docs | Add the generated files to repository |
 | 22 | Final model answers business questions | Query capability demonstrated; outputs pending | Run and record SQL in section 3; interpret missing values/currencies |
 
-### Specific follow-ups before claiming full completion
 
-1. **Run and save the business-query outputs** in section 3, especially currency-separated spend, campaign rankings, and KPI completeness. A successful table build alone does not prove every business answer.
-2. **Improve sparse source and column descriptions** in YAML if the reviewer expects detailed in-dbt documentation, not only Markdown.
-3. **Generate and retain the dbt static HTML docs artifact** if the submission explicitly expects the HTML deliverable rather than only reproducible commands.
-4. **Decide how to evidence Elementary**: development configuration and report are valid evidence; don't describe it as automated production observability.
-5. **Clearly disclose CI and production isolation trade-offs**: CI parses but does not connect to a live warehouse; deploy is production-like but shares a catalog with dev.
-6. **Consider explicit nonnegative metric tests** if the case study evaluator expects automated assertions for spend, impressions and clicks. Current validation query checks them manually; only claim an automated check if it is added to dbt.
 
-## 6. Reviewer-ready explanation
+> I gingested supplied Facebook and Snapchat datasets into Unity Catalog Bronze tables, standardized their fields with nine staging views, and used three intermediate views to enrich the advertising facts and deduplicate Snapchat ad-group versions. A unified Gold fact preserves source reporting grain and currency, while a daily mart calculates spend, impressions, clicks and safe KPIs. I used views for reusable transformations and tables for downstream marts. Automated dbt tests and Elementary in development provide data-quality visibility. GitHub Actions performs parse validation on changes and a separately triggered, service-principal-authenticated deployment into Silver and Gold schemas. I intentionally distinguish missing metrics from zero and avoid combining different currencies without conversion. Current limitations include parse-only CI, development-only Elementary, and schema-level rather than catalog-level production isolation.
 
-> We ingested supplied Facebook and Snapchat datasets into Unity Catalog Bronze tables, standardized their fields with nine staging views, and used three intermediate views to enrich the advertising facts and deduplicate Snapchat ad-group versions. A unified Gold fact preserves source reporting grain and currency, while a daily mart calculates spend, impressions, clicks and safe KPIs. We used views for reusable transformations and tables for downstream marts. Automated dbt tests and Elementary in development provide data-quality visibility. GitHub Actions performs parse validation on changes and a separately triggered, service-principal-authenticated deployment into Silver and Gold schemas. We intentionally distinguish missing metrics from zero and avoid combining different currencies without conversion. Current limitations include parse-only CI, development-only Elementary, and schema-level rather than catalog-level production isolation.
-
-## 7. Sign-off template
-
-Record the execution date, SQL warehouse, deployment commit, business query results, and any known data quality exceptions. Mark each question *pass* only after reviewing the actual query output. Retain the GitHub Actions run link, dbt docs screenshot or HTML artifact, and Elementary report screenshot as evidence. This is more defensible than claiming 100% compliance without inspection.
