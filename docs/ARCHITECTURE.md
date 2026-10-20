@@ -112,7 +112,7 @@ The fact does **not** have one universal campaign/day row. This prevents double 
 
 `clicks_complete` is true when `missing_click_records = 0`; `impressions_complete` similarly checks impressions. Incomplete groups expose partial additive totals but suppress affected ratio metrics. **Important limitation:** the mart's KPI suppression checks clicks and impressions, but not a missing-spend completeness flag; future work could extend that control if spend nullability is material. Zero denominators are handled by `NULLIF`, producing `NULL` rather than division errors. The fact is the right level for drilling into campaigns, while the daily mart serves platform/date reporting.
 
-**Currency governance:** `EUR` and `USD` are separate units. Summing their spend together without an FX rate would be mathematically possible but financially misleading. Present spend grouped by `currency_code`, or convert using a governed rate table (not implemented).
+**Currency governance:** `EUR` and `USD` are separate units. Summing their spend together without an FX rate would be mathematically possible but financially misleading. Present spend grouped by `currency_code`.
 
 ## 7. Data quality and observability
 
@@ -172,13 +172,11 @@ flowchart LR
 - `.github/workflows/dbt-deploy-test.yml`: manually verifies OAuth and dbt connectivity.
 - `.github/workflows/dbt-deploy.yml`: manual `workflow_dispatch`; `uv sync`, `dbt deps`, `dbt build --profiles-dir ../.github/deploy --target deploy --select package:marketing_dbt`.
 
-The observed manual deployment passed in approximately 1 minute 12 seconds. The code does not auto-deploy after a merge; that is a possible next iteration.
 
 ## 11. Security and governance
 
-The deploy profile obtains host, client ID, and client secret from GitHub Actions Secrets via `env_var`. OAuth machine-to-machine authentication is used, not a personal access token. The `marketing-dbt-ci` service principal has SQL warehouse access, catalog/schema usage, Bronze read privileges, and sufficient write privileges on Silver/Gold for the verified deployment. Analysts need their own explicit `SELECT` grants on Gold; the initial post-deploy personal-user query failed until read access was granted. Follow least privilege and avoid granting broad administrative rights just to simplify a build.
+The deploy profile obtains host, client ID, and client secret from GitHub Actions Secrets via `env_var`. OAuth machine-to-machine authentication is used, not a personal access token. The `marketing-dbt-ci` service principal has SQL warehouse access, catalog/schema usage, Bronze read privileges, and sufficient write privileges on Silver/Gold for the verified deployment. 
 
-The CI profile uses a placeholder host/token solely to parse dbt without connecting. Never reuse this placeholder as a live credential, and never store real credentials in source control.
 
 ## 12. Known limitations, risk register, and extensions
 
@@ -196,10 +194,3 @@ The CI profile uses a placeholder host/token solely to parse dbt without connect
 | Incremental processing | Full rebuild | Implement incremental with late-data strategy at scale |
 | Dashboard | Not built | Optional downstream consumer, not core assignment |
 
-## 13. How to verify the architecture
-
-1. Inspect `marketing_dbt/models/sources.yml` and model `ref()` chains.
-2. Run `uv run dbt docs generate` from `marketing_dbt` with a working local profile; open `uv run dbt docs serve` to view lineage.
-3. Confirm `marketing_dev.silver` contains nine staging and three intermediate views, and `marketing_dev.gold` contains the two business tables.
-4. Run the SQL checks in [VALIDATION.md](VALIDATION.md), including grain, completeness, reconciliation, and business-question queries.
-5. Review the GitHub Actions logs and repository workflows for precise CI/deployment guarantees.
