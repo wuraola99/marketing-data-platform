@@ -1,0 +1,34 @@
+
+name: Deploy dbt to Databricks
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Build and test dbt models
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Install dependencies
+        working-directory: marketing_dbt
+        run: uv sync
+
+      - name: Build and test dbt models
+        working-directory: marketing_dbt
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_CLIENT_ID: ${{ secrets.DATABRICKS_CLIENT_ID }}
+          DATABRICKS_CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
+        run: |
+          uv run dbt deps
+          uv run dbt build \
+            --profiles-dir ../.github/deploy \
+            --target deploy \
+            --select package:marketing_dbt
