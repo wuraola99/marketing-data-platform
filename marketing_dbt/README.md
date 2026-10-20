@@ -14,7 +14,7 @@ uv run dbt docs generate
 uv run dbt docs serve
 ```
 
-These commands use your locally configured `~/.dbt/profiles.yml`; check your target and credentials before building. For the full setup, schema naming, and security details, see the [root README](../README.md) and [architecture guide](../docs/ARCHITECTURE.md).
+These commands use the locally configured `~/.dbt/profiles.yml`; For the full setup, schema naming, and security details, see the [root README](../README.md) and [architecture guide](../docs/ARCHITECTURE.md).
 
 ## Models
 
@@ -29,4 +29,4 @@ These commands use your locally configured `~/.dbt/profiles.yml`; check your tar
 
 Production-like deployment is triggered manually through `.github/workflows/dbt-deploy.yml`. It uses an OAuth service principal and writes to `marketing_dev.silver` and `marketing_dev.gold`. Local development writes to `marketing_dev.default_silver` and `marketing_dev.default_gold` using the custom `generate_schema_name` macro. Elementary is enabled for development and disabled for the deploy target.
 
-For query examples and the case-study checklist, see [Validation](../docs/VALIDATION.md).
+For query and the case-study checklist, see [Validation](../docs/VALIDATION.md).
