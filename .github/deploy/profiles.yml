@@ -1,0 +1,13 @@
+marketing_dbt:
+  target: deploy
+  outputs:
+    deploy:
+      type: databricks
+      host: "{{ env_var('DATABRICKS_HOST') }}"
+      http_path: /sql/1.0/warehouses/2c360fe4da11abb1
+      catalog: marketing_dev
+      schema: deploy
+      auth_type: oauth
+      client_id: "{{ env_var('DATABRICKS_CLIENT_ID') }}"
+      client_secret: "{{ env_var('DATABRICKS_CLIENT_SECRET') }}"
+      threads: 4
