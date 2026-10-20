@@ -42,3 +42,6 @@ models:
     marts:
       +materialized: table
       +schema: gold
+
+  elementary:
+    +enabled: "{{ target.name != 'deploy' }}"
