@@ -18,6 +18,57 @@ jobs:
       - name: Install project dependencies
         run: uv sync --frozen
 
+      - name: Test Databricks OAuth credentials
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_CLIENT_ID: ${{ secrets.DATABRICKS_CLIENT_ID }}
+          DATABRICKS_CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
+        run: |
+          python - <<'PY'
+          import os
+          import base64
+          import urllib.parse
+          import urllib.request
+          import urllib.error
+
+          host = os.environ["DATABRICKS_HOST"].removeprefix("https://")
+          client_id = os.environ["DATABRICKS_CLIENT_ID"]
+          client_secret = os.environ["DATABRICKS_CLIENT_SECRET"]
+
+          url = f"https://{host}/oidc/v1/token"
+
+          payload = urllib.parse.urlencode({
+              "grant_type": "client_credentials",
+              "scope": "all-apis"
+          }).encode()
+
+          credentials = base64.b64encode(
+              f"{client_id}:{client_secret}".encode()
+          ).decode()
+
+          request = urllib.request.Request(
+              url,
+              data=payload,
+              headers={
+                  "Authorization": f"Basic {credentials}",
+                  "Content-Type": "application/x-www-form-urlencoded"
+              },
+              method="POST"
+          )
+
+          try:
+              with urllib.request.urlopen(request, timeout=30) as response:
+                  print("OAuth authentication successful!")
+                  print("HTTP status:", response.status)
+          except urllib.error.HTTPError as error:
+              print("OAuth authentication failed.")
+              print("HTTP status:", error.code)
+              raise SystemExit(1)
+          except Exception as error:
+              print("OAuth request failed:", type(error).__name__)
+              raise SystemExit(1)
+          PY
+
       - name: Test Databricks connection
         working-directory: marketing_dbt
         env:
